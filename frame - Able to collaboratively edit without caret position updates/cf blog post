@@ -1,0 +1,41 @@
+Hi
+
+I have the following problem, you can assume length to be small, like 200  :
+
+There is a string OLD. Two people each receive a copy of OLD to make some changes independently to their own copies of OLD. Let's call the first person's edited string EDIT1, and the second person's edited string EDIT2.
+
+eg: 
+OLD   : abcdefgh  
+EDIT1 : abcxxfgh  
+EDIT2 : ppabcppfg  
+
+the edits are of type : 
+1. insert any number of strings of any length anywhere in OLD, [insert position,insert string]  
+2. delete any number of substrings from OLD, [delete position, substring]  
+These edits can be in any order
+
+
+Now, both EDIT1 and EDIT2 must be merged into string NEW, under the following rules:
+
+1. if either user deletes something, that delete should be reflected in new  
+2. if either user inserts something, that insert should be reflected in new   
+3. in case of two overlapping deletes by both the people, overlapped portion is considered only once (see examples below)  
+4. a delete and insert can overlap, and both should be reflected in new
+
+Input : OLD,EDIT1,EDIT2  
+
+eg :  
+1.if OLD is aabbcc, and person 1 deletes substring "bb" edit1 becomes aacc, and person2 inserts string "bb" such that edit2 becomes aabbbbcc, then NEW can be "aabbcc", as it inserted one "bb" and deleted another "bb" at the positions where these people made their edits in OLD's copy. 
+
+Notice that we have to decide suitable edit positions and edit substrings/strings, it's not in input.
+
+2.if OLD is xabbyy, edit1 is xcccyy, edit2 is xayy, then NEW can possibly be xcccyy, as it can be said that "bb" was deleted by person 2, "abb" was deleted by person 1, "ccc" was inserted by person 1. So delete of "bb" and "abb" overlapped.
+
+3.if OLD is xabbyy, edit1 is xbbbyy, edit2 is xayy, then NEW can possibly be xbbbyy, as it can be said that "bb" was deleted by person 2, "abb" was deleted by person 1, "bbb" was inserted by person 1. So delete of "bb" and "abb" overlapped.
+
+We can alternately say person 1 deleted "a" and inserted "b" in it's place, person 2 deleted "bb" and then NEW will be xbyy, which is also valid.
+
+So, the problem is, both the people will get to look at NEW. They both want a justification that their operations were successfully integrated into NEW. Our task is to find any string NEW that can make both the people satisfied that their changes were incorporated in OLD, and no changes other than their changes were done. You can assume input always allows a valid NEW string, and that both the people have forgotten their exact operations, they only remember OLD, EDIT1, EDIT2, and NEW.
+
+
+It's quite hard for me. Can someone help how this can be solved?

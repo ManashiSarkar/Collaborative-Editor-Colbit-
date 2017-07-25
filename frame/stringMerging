@@ -1,0 +1,192 @@
+1.old is sent to server
+2.
+	1.datafromserver will be compared to old, as datafromserver is the latest version
+	2.new=getText() will be compared to old, as getText() will be the latest. 
+	  if new == old, simply replace text with datafromserver
+3.after marking what's new, what's deleted, all will be merged to old and setText()
+4.highlight text that conflicts over changes in index, eg:inserted at same index, remove highlight on hover
+
+
+
+// server deleted one substring, client added a different unrelated substring
+eg1: 
+old : qwertAAAAyuiop
+DFS : qwertyuiop
+
+patched1 : qwertAAAAyuiop, mark AAAA to delete
+
+old : qwertAAAAyuiop
+new : qwertAAAAyuiopXXXX
+
+patched2 : qwertAAAAyuiop, mark XXXX to insert
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop - AAAA + XXXX
+
+setText(patched3)
+
+
+
+// server deleted one substring, client deleted a different unrelated substring
+eg2: 
+old : qwertAAAAyuiop
+DFS : qwertyuiop
+
+patched1 : qwertAAAAyuiop, mark AAAA to delete
+
+old : qwertAAAAyuiop
+new : qwertAAAAyui
+
+patched2 : qwertAAAAyuiop, mark op to delete
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop - AAAA - op
+
+setText(patched3)
+
+
+
+// server deleted one substring, client deleted a portion of the same substring
+eg3: 
+old : qwertAAAAyuiop
+DFS : qwertyuiop
+
+patched1 : qwertAAAAyuiop, mark AAAA to delete
+
+old : qwertAAAAyuiop
+new : qwertAAiop
+
+patched2 : qwertAAAAyuiop, mark AAyu to delete
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop - AAAA - AAyu (index merging of [5,8] and [7,10])
+
+setText(patched3)
+
+
+// server added one substring, client added a different unrelated substring
+eg4: 
+old : qwertAAAAyuiop
+DFS : qwertAAAABBBByuiop
+
+patched1 : qwertAAAAyuiop, mark BBBB to insert
+
+old : qwertAAAAyuiop
+new : qwertAAAAyuiopXXXX
+
+patched2 : qwertAAAAyuiop, mark XXXX to insert
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop + BBBB + XXXX
+
+setText(patched3)
+
+
+// server added one substring, client added a substring at the same index
+eg5: 
+old : qwertAAAAyuiop
+DFS : qwertAAAABBBByuiop
+
+patched1 : qwertAAAAyuiop, mark BBBB to insert
+
+old : qwertAAAAyuiop
+new : qwertAAAAXXXXyuiop
+
+patched2 : qwertAAAAyuiop, mark XXXX to insert
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop + BBBB + XXXX ( as new is more latest compared to DFS)
+
+setText(patched3)
+
+
+// server deleted one substring, client added a position interfering substring
+eg6: 
+old : qwertAAAAyuiop
+DFS : qwertyuiop
+
+patched1 : qwertAAAAyuiop, mark AAAA to delete
+
+old : qwertAAAAyuiop
+new : qwertAAxxxxAAyuiop
+
+patched2 : qwertAAAAyuiop, mark xxxx to insert
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop - AAAA + xxxx ( -[5,8] + 7 -> 7 will be moved to 5 )
+
+setText(patched3)
+
+
+// server added one substring, client deleted an unrelated substring
+eg7: 
+old : qwertAAAAyuiop
+DFS : qwertAAAAyuiopBBBB
+
+patched1 : qwertAAAAyuiop, mark BBBB to insert
+
+old : qwertAAAAyuiop
+new : qwertyuiop
+
+patched2 : qwertAAAAyuiop, mark AAAA to delete
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop + BBBB - AAAA
+
+setText(patched3)
+
+
+// server added one substring, client deleted a position interfering substring -> practically same as unrelated
+eg8: 
+old : qwertAAAAyuiop
+DFS : BBBBqwertAAAAyuiop
+
+patched1 : qwertAAAAyuiop, mark BBBB to insert
+
+old : qwertAAAAyuiop
+new : AAAAyuiop
+
+patched2 : qwertAAAAyuiop, mark qwert to delete
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop + BBBB - qwert (BBBB and qwert share only end and start indices)
+
+setText(patched3)
+
+
+// server replaced one substring with another, client has no an unrelated delete/insert somewhere
+eg9: 
+old : qwertAAAAyuiop
+DFS : qwertBBBByuiop
+
+patched1 : qwertAAAAyuiop, mark AAAA to delete, BBBB to insert
+
+old : qwertAAAAyuiop
+new : AAAAyuiop
+
+patched2 : qwertAAAAyuiop, mark qwert to delete
+
+patched3 : patched1 X patched2 : qwertAAAAyuiop + BBBB - qwert (BBBB and qwert share only end and start indices)
+
+setText(patched3)
+
+
+
+test cases:
+
+1.
+old: qwertyuioplkjhgfdsa
+DFS: qyuiAAoplkjhbbgfdsa
+new: QQqfJJJJJJJJdaQQ
+
+patched1 : old x DFS:
+Delete : wert[1,4]
+Added  : AA[8,8], bb[14,14]
+
+patched2 : old x new:
+Delete : wertyuioplkjhg[1,14], s[17,17]
+Added  : QQ[0,0], JJJJJJJJ[16,16], QQ[19,19]
+
+
+
+
+
+
+
+
+
+
+
+
